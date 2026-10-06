@@ -1,0 +1,49 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "types": [
+      "node"
+    ],
+    "paths": {
+      "@/*": [
+        "./shared/*"
+      ],
+      "cloudflare:workers": [
+        "./server/runtime.ts"
+      ],
+      "@/lib/server": [
+        "./server/domain.ts"
+      ],
+      "@/app/chatgpt-auth": [
+        "./server/auth.ts"
+      ]
+    }
+  },
+  "include": [
+    "server/**/*.ts",
+    "client/**/*.tsx",
+    "scripts/**/*.ts",
+    "tests/**/*.ts",
+    "shared/lib/**/*.ts",
+    "shared/app/portal-app.tsx",
+    "shared/app/api/**/*.ts"
+  ],
+  "exclude": [
+    "shared/app/chatgpt-auth.ts",
+    "shared/app/page.tsx",
+    "shared/app/layout.tsx",
+    "tests/sites-auth.fixture.ts"
+  ]
+}

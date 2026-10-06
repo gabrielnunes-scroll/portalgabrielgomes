@@ -1,0 +1,16 @@
+# Copy to .env locally. In Cloud Run use environment variables and Secret Manager.
+FIREBASE_PROJECT_ID=
+FIREBASE_OWNER_UID=
+FIREBASE_STORAGE_BUCKET=
+FIREBASE_WEB_API_KEY=
+FIREBASE_AUTH_DOMAIN=
+FIREBASE_APP_ID=
+PORTAL_URL=http://localhost:8080
+PORT=8080
+# Remain false until login, migration, sender and recipient tests are complete.
+NOTIFICATIONS_ENABLED=false
+RESEND_API_KEY=
+MAIL_FROM=
+MAIL_JOB_TOKEN=
+# Locally: GOOGLE_APPLICATION_CREDENTIALS=/absolute/private/service-account.json
+# Cloud Run: use its service account / Application Default Credentials. No key file in code.

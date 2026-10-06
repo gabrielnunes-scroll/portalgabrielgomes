@@ -1,0 +1,6 @@
+import type {Item} from './model';
+export type Appointment={id:string;type:'Reunião'|'Discovery';date:string;title:string;project?:string;lead?:string;done?:boolean};
+export function agendaEntries(items:Item[]):Appointment[]{return items.flatMap<Appointment>(r=>r.kind==='meeting'&&r.data.date?[{id:r.id,type:'Reunião' as const,date:r.data.date,title:r.data.title,project:r.project||undefined}]:r.kind==='lead'&&r.data.callDate?[{id:r.id,type:'Discovery' as const,date:r.data.callDate,title:'Discovery · '+(r.data.company||r.data.name),lead:r.id,done:!!r.data.callDone}]:[]).sort((a,b)=>a.date.localeCompare(b.date));}
+export function nextAppointments(items:Item[],now:string){return agendaEntries(items).filter(r=>r.date>=now&&!r.done);}
+
+export function appointmentMonths(entries:Appointment[]){const groups=new Map<string,Appointment[]>();for(const entry of [...entries].sort((a,b)=>a.date.localeCompare(b.date))){const key=entry.date.slice(0,7);if(!groups.has(key))groups.set(key,[]);groups.get(key)!.push(entry);}return [...groups].map(([month,appointments])=>({month,label:new Date(Number(month.slice(0,4)),Number(month.slice(5,7))-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}),appointments}));}

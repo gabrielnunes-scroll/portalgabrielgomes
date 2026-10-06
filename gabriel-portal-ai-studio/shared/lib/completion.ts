@@ -1,0 +1,17 @@
+import type {Item} from './model';
+import {outstanding} from './finance';
+export const completionFields=['completedAt','completedBy','completionSummary','handoverInstructions','nextSteps','finalMaterialIds','completionCaveats','completionChecks'] as const;
+export function completionChecks(items:Item[],project:string){
+ const rows=items.filter(r=>r.project===project),latest=new Map<string,Item>();
+ for(const r of rows.filter(r=>r.kind==='delivery'&&r.data.visibility==='published')){const key=r.data.title.trim().toLowerCase(),old=latest.get(key);if(!old||r.data.version>old.data.version||(r.data.version===old.data.version&&r.created>old.created))latest.set(key,r);}
+ const approvals=rows.filter(r=>r.kind==='approval'),charges=rows.filter(r=>r.kind==='charge'),balance=outstanding(rows);
+ return [{title:'Últimas versões aprovadas',done:latest.size>0&&[...latest.values()].every(r=>approvals.some(a=>a.data.delivery===r.id&&a.data.decision==='approved'))},{title:'Tarefas internas concluídas',done:rows.filter(r=>r.kind==='task').every(r=>r.data.status==='Concluída')},{title:'Solicitações do cliente concluídas',done:rows.filter(r=>r.kind==='action').every(r=>r.data.status==='Concluída')},{title:'Pagamentos conferidos e quitados',done:charges.length>0&&balance<=0}];
+}
+export function finalMaterials(items:Item[],project:string){return items.filter(r=>r.project===project&&((r.kind==='document'&&r.data.visibility==='published')||(r.kind==='delivery'&&r.data.visibility==='published'&&items.some(a=>a.kind==='approval'&&a.data.delivery===r.id&&a.data.decision==='approved'))));}
+
+export function completionSuggestions(service:string){
+ if(service==='Communication Project')return {instructions:'Utilize a direção estratégica e os ativos implementados neste projeto conforme o escopo e as orientações dos materiais finais. A entrega reúne a fase estratégica e a fase de implementação em uma única contratação.',next:'Acompanhe os resultados da solução implementada. Se houver necessidade de evolução contínua, participação recorrente na operação ou acompanhamento de equipes e fornecedores, podemos definir um escopo de Communication Optimization.'};
+ if(service==='Communication Implementation')return {instructions:'Utilize os materiais finais e as orientações deste projeto para aplicar a comunicação nos canais previstos no escopo. Revise os detalhes de publicação com o profissional responsável pela implementação.',next:'Após a implementação, acompanhe os resultados e identifique oportunidades de melhoria. Podemos avaliar um novo ciclo de trabalho por meio do Communication Optimization.'};
+ if(service==='Communication Optimization')return {instructions:'Aplique os ajustes e as recomendações apresentados nos materiais finais, conforme o escopo do projeto. Acompanhe os indicadores definidos e use os resultados para orientar as próximas decisões.',next:'Continue acompanhando os resultados das mudanças realizadas. Caso sejam identificadas novas oportunidades, podemos avaliar outro ciclo de Communication Optimization.'};
+ return {instructions:'O projeto poderá ser implementado por um copywriter da sua equipe, por um profissional terceirizado ou por mim, mediante a contratação do Communication Implementation.',next:'O próximo passo é transformar as recomendações em execução. Caso queira seguir comigo, podemos definir o escopo e as condições do Communication Implementation.'};
+}
